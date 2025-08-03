@@ -1,7 +1,7 @@
 trigger: none
 
 pool:
-  vmImage: Default
+  name: Default
 
 variables:
  - group: Mytfsecrets
