@@ -5,5 +5,30 @@ pool:
 
 variables:
  - group: Mytfsecrets
-  terraformVersion: 'latest'
-  tf_dir: 'New Resource group'
+
+steps:
+- task: TerraformInstaller@1
+  displayName: tfinstall
+  inputs:
+    terraformVersion: 'latest'
+
+- script: 
+    echo "Initialization Terraform..."
+    terraform init
+  displayName: 'Terraform Init'
+
+- script: 
+    echo "Planning Terraform.."
+    terraform plan -out=tfplan
+  displayName: 'Terraform Plan'
+
+- script: 
+    echo "Applying Terraform.."
+    terraform plan -out=tfplan
+  displayName: 'Terraform Apply'
+
+  env:
+    ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+    ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+    ARM_TENANT_ID: $(ARM_TENANT_ID)
