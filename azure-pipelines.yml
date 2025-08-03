@@ -1,0 +1,9 @@
+trigger: none
+
+pool:
+  vmImage: default
+
+variables:
+ - group: Mytfsecrets
+  terraformVersion: 'latest'
+  tf_dir: 'New Resource group'
