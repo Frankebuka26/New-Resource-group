@@ -1,0 +1,11 @@
+trigger: none
+
+pool:
+  name: Default
+
+parameters:
+  - name: stages
+    type: object
+    default:
+      - name: dev
+      - name: prod
