@@ -31,7 +31,7 @@ stages:
 
          - script: 
              echo "Planning Terraform.."
-             terraform plan -out=tfplan
+             terraform plan -out=tfplan -autoapprove
            displayName: 'Terraform Plan'
 
            env:
