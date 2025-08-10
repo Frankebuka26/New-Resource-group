@@ -6,6 +6,13 @@ pool:
 variables:
  - group: Mytfsecrets
 
+parameters:
+  - name: stages
+    type: object
+    default:
+      - name: dev
+      - name: prod
+
 stages:
   - stage: plan
     jobs:
@@ -33,34 +40,36 @@ stages:
              ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
              ARM_TENANT_ID: $(ARM_TENANT_ID)
 
-  - stage: apply
-    dependsOn: plan
-    condition: succeeded()
-    jobs:
-      - job: apply
-        steps:
-         - task: TerraformInstaller@1
-           displayName: tfinstall
-           inputs:
-             terraformVersion: 'latest'
+  - ${{each stage in parameters.stages}}:
+    - stage: ${{stage.name}}
+      dependsOn: plan
+      condition: succeeded()
+      variables:
+      - group: vg-${{stage.name}}
+      jobs:
+        - deployment: ${{stage.name}}_deploy
+          environment: ${{stage.name}}_environment
+          strategy:
+            runOnce:
+             deploy:
+               steps:
+               - task: TerraformInstaller@1
+                 displayName: tfinstall
+                 inputs:
+                   terraformVersion: 'latest'
 
-         - script: 
-             echo "Initialization Terraform..."
-             terraform init
-           displayName: 'Terraform Init'
+               - script: 
+                   echo "Initialization Terraform..."
+                   terraform init
+                 displayName: 'Terraform Init'
 
-         - script: 
-             echo "Planning Terraform.."
-             terraform plan -out=tfplan
-           displayName: 'Terraform Plan'
+               - script: 
+                   echo "Applying Terraform.."
+                   terraform plan -out=tfplan
+                 displayName: 'Terraform Apply'
 
-         - script: 
-             echo "Applying Terraform.."
-             terraform plan -out=tfplan
-           displayName: 'Terraform Apply'
-
-           env:
-             ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-             ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-             ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-             ARM_TENANT_ID: $(ARM_TENANT_ID)
+                 env:
+                   ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+                   ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+                   ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+                   ARM_TENANT_ID: $(ARM_TENANT_ID)
