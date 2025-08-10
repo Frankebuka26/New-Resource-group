@@ -48,7 +48,7 @@ stages:
       - group: vg-${{stage.name}}
       jobs:
         - deployment: ${{stage.name}}_deploy
-          environment: ${{stage.name}}_environment
+          environment: ${{stage.name}}_Resourcegroup
           strategy:
             runOnce:
              deploy:
